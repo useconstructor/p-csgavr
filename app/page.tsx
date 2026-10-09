@@ -18,13 +18,13 @@ interface BookType {
 
 const recentBooks = [
   { id: 1, title: 'Cien años de soledad', author: 'Gabriel García Márquez', completedDate: '15 Sep 2026', coverColor: '#E8D5B7' },
-  { id: 2, title: 'El amor en los tiempos del cólera', author: 'Gabriel García Márquez', completedDate: '28 Ago 2026', coverColor: '#C9E4CA' },
-  { id: 3, title: '1984', author: 'George Orwell', completedDate: '10 Ago 2026', coverColor: '#D4C5F9' },
-  { id: 4, title: 'Rayuela', author: 'Julio Cortázar', completedDate: '22 Jul 2026', coverColor: '#F9D5D3' },
-  { id: 5, title: 'La sombra del viento', author: 'Carlos Ruiz Zafón', completedDate: '05 Jul 2026', coverColor: '#B8D4E3' },
-  { id: 6, title: 'Don Quijote de la Mancha', author: 'Miguel de Cervantes', completedDate: '18 Jun 2026', coverColor: '#F5E6C8' },
-  { id: 7, title: 'El principito', author: 'Antoine de Saint-Exupéry', completedDate: '02 Jun 2026', coverColor: '#FFE4B5' },
-  { id: 8, title: 'Pedro Páramo', author: 'Juan Rulfo', completedDate: '15 May 2026', coverColor: '#E0E0E0' },
+  { id: 2, title: 'El amor en los tiempos del cólera', author: 'Gabriel García Márquez', completedDate: '28 Ago 2026', coverColor: '#E5D4B3' },
+  { id: 3, title: '1984', author: 'George Orwell', completedDate: '10 Ago 2026', coverColor: '#DED0B8' },
+  { id: 4, title: 'Rayuela', author: 'Julio Cortázar', completedDate: '22 Jul 2026', coverColor: '#E8D5B7' },
+  { id: 5, title: 'La sombra del viento', author: 'Carlos Ruiz Zafón', completedDate: '05 Jul 2026', coverColor: '#E5D4B3' },
+  { id: 6, title: 'Don Quijote de la Mancha', author: 'Miguel de Cervantes', completedDate: '18 Jun 2026', coverColor: '#DED0B8' },
+  { id: 7, title: 'El principito', author: 'Antoine de Saint-Exupéry', completedDate: '02 Jun 2026', coverColor: '#E8D5B7' },
+  { id: 8, title: 'Pedro Páramo', author: 'Juan Rulfo', completedDate: '15 May 2026', coverColor: '#E5D4B3' },
 ]
 
 export default function HomePage() {
@@ -97,12 +97,10 @@ export default function HomePage() {
   }
 
   const navLinks = [
-    { label: 'Inicio', href: '#inicio' },
-    { label: 'Lecturas', href: '#lecturas' },
-    { label: 'Mi Biblioteca', href: '#biblioteca' },
+    { label: 'Mis Libros', href: '#lecturas' },
     { label: 'Estadísticas', href: '#estadisticas' },
-    { label: 'Contacto', href: '#contacto' },
-    { label: 'Ayuda', href: '#ayuda' },
+    { label: 'Listas', href: '#listas' },
+    { label: 'Sobre mí', href: '#sobre-mi' },
   ]
 
   return (
@@ -166,18 +164,18 @@ export default function HomePage() {
         </div>
       </nav>
 
-      {/* Hero Section with Gradient */}
-      <section id="inicio" className="py-20 md:py-28 bg-gradient-to-br from-[#D97757] via-[#E8956F] to-[#F5A962]">
+      {/* Hero Section */}
+      <section id="inicio" className="py-20 md:py-28 bg-[#F5F0E8]">
         <div className="max-w-6xl mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-6xl font-bold text-white mb-6" style={{ fontFamily: 'Poppins, sans-serif' }}>
+          <h1 className="text-4xl md:text-6xl font-bold text-[#2C2C2C] mb-6" style={{ fontFamily: 'Poppins, sans-serif' }}>
             Tu historia de lectura
           </h1>
-          <p className="text-white/90 text-lg md:text-xl mb-8 max-w-2xl mx-auto">
+          <p className="text-[#7A756F] text-lg md:text-xl mb-8 max-w-2xl mx-auto">
             Registra cada libro, recuerda cada historia. Tu biblioteca personal te espera.
           </p>
           <Button
             onClick={() => setShowModal(true)}
-            className="bg-white text-[#D97757] hover:bg-white/90 px-8 py-4 h-auto text-lg font-semibold"
+            className="bg-[#D97757] text-white hover:bg-[#c56646] px-8 py-4 h-auto text-lg font-semibold"
           >
             <Plus className="w-5 h-5 mr-2" />
             Comenzar ahora
@@ -226,7 +224,7 @@ export default function HomePage() {
       <section id="contacto" className="py-16 bg-white border-y border-[#e5e2de]">
         <div className="max-w-xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-[#2C2C2C] mb-2 text-center" style={{ fontFamily: 'Poppins, sans-serif' }}>
-            Contacto
+            Hablemos
           </h2>
           <p className="text-[#7A756F] text-center mb-8">
             ¿Tienes sugerencias o comentarios? Escríbenos.
@@ -240,27 +238,29 @@ export default function HomePage() {
             </div>
           ) : (
             <form onSubmit={handleContactSubmit} className="space-y-4">
-              <div>
-                <label htmlFor="name" className="block text-sm font-medium text-[#2C2C2C] mb-1">Nombre</label>
-                <Input
-                  id="name"
-                  type="text"
-                  required
-                  value={formData.name}
-                  onChange={e => setFormData({ ...formData, name: e.target.value })}
-                  className="bg-[#F9F7F4] border-[#e5e2de] focus:border-[#D97757] focus:ring-[#D97757]"
-                />
-              </div>
-              <div>
-                <label htmlFor="email" className="block text-sm font-medium text-[#2C2C2C] mb-1">Correo electrónico</label>
-                <Input
-                  id="email"
-                  type="email"
-                  required
-                  value={formData.email}
-                  onChange={e => setFormData({ ...formData, email: e.target.value })}
-                  className="bg-[#F9F7F4] border-[#e5e2de] focus:border-[#D97757] focus:ring-[#D97757]"
-                />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label htmlFor="name" className="block text-sm font-medium text-[#2C2C2C] mb-1">Nombre</label>
+                  <Input
+                    id="name"
+                    type="text"
+                    required
+                    value={formData.name}
+                    onChange={e => setFormData({ ...formData, name: e.target.value })}
+                    className="bg-[#F9F7F4] border-[#e5e2de] focus:border-[#D97757] focus:ring-[#D97757]"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="email" className="block text-sm font-medium text-[#2C2C2C] mb-1">Correo electrónico</label>
+                  <Input
+                    id="email"
+                    type="email"
+                    required
+                    value={formData.email}
+                    onChange={e => setFormData({ ...formData, email: e.target.value })}
+                    className="bg-[#F9F7F4] border-[#e5e2de] focus:border-[#D97757] focus:ring-[#D97757]"
+                  />
+                </div>
               </div>
               <div>
                 <label htmlFor="message" className="block text-sm font-medium text-[#2C2C2C] mb-1">Mensaje</label>
@@ -288,6 +288,25 @@ export default function HomePage() {
               </Button>
             </form>
           )}
+        </div>
+      </section>
+
+      {/* CTA Banner */}
+      <section className="py-16 bg-[#D97757]">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <h2 className="text-2xl md:text-3xl font-bold text-white mb-4" style={{ fontFamily: 'Poppins, sans-serif' }}>
+            Haz de la lectura un hábito para siempre
+          </h2>
+          <p className="text-white/90 mb-8 max-w-2xl mx-auto">
+            Comienza a registrar tus lecturas hoy y descubre patrones en tus hábitos de lectura.
+          </p>
+          <Button
+            onClick={() => setShowModal(true)}
+            className="bg-white text-[#D97757] hover:bg-white/90 px-8 py-4 h-auto text-lg font-semibold"
+          >
+            <Plus className="w-5 h-5 mr-2" />
+            Empezar ahora
+          </Button>
         </div>
       </section>
 
