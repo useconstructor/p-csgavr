@@ -3,17 +3,29 @@
 import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { Book, Plus, X, Check, Menu, BookOpen, CheckCircle, Clock, Send } from 'lucide-react'
+import { Plus, X, Menu, BookOpen, Send, CheckCircle } from 'lucide-react'
 
 interface BookType {
   id: number
   title: string
   author: string
   status: 'Pendiente' | 'Leído'
+  completedDate?: string
+  coverColor?: string
 }
+
+const recentBooks = [
+  { id: 1, title: 'Cien años de soledad', author: 'Gabriel García Márquez', completedDate: '15 Sep 2026', coverColor: '#E8D5B7' },
+  { id: 2, title: 'El amor en los tiempos del cólera', author: 'Gabriel García Márquez', completedDate: '28 Ago 2026', coverColor: '#C9E4CA' },
+  { id: 3, title: '1984', author: 'George Orwell', completedDate: '10 Ago 2026', coverColor: '#D4C5F9' },
+  { id: 4, title: 'Rayuela', author: 'Julio Cortázar', completedDate: '22 Jul 2026', coverColor: '#F9D5D3' },
+  { id: 5, title: 'La sombra del viento', author: 'Carlos Ruiz Zafón', completedDate: '05 Jul 2026', coverColor: '#B8D4E3' },
+  { id: 6, title: 'Don Quijote de la Mancha', author: 'Miguel de Cervantes', completedDate: '18 Jun 2026', coverColor: '#F5E6C8' },
+  { id: 7, title: 'El principito', author: 'Antoine de Saint-Exupéry', completedDate: '02 Jun 2026', coverColor: '#FFE4B5' },
+  { id: 8, title: 'Pedro Páramo', author: 'Juan Rulfo', completedDate: '15 May 2026', coverColor: '#E0E0E0' },
+]
 
 export default function HomePage() {
   const [books, setBooks] = useState<BookType[]>([])
@@ -21,7 +33,6 @@ export default function HomePage() {
   const [showModal, setShowModal] = useState(false)
   const [newBook, setNewBook] = useState({ title: '', author: '', status: 'Pendiente' })
   const [saving, setSaving] = useState(false)
-  const [deleteConfirm, setDeleteConfirm] = useState<number | null>(null)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [formData, setFormData] = useState({ name: '', email: '', message: '' })
   const [formSubmitting, setFormSubmitting] = useState(false)
@@ -63,30 +74,6 @@ export default function HomePage() {
     }
   }
 
-  async function toggleStatus(book: BookType) {
-    const newStatus = book.status === 'Pendiente' ? 'Leído' : 'Pendiente'
-    try {
-      await fetch(`/api/books/${book.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: newStatus })
-      })
-      setBooks(books.map(b => b.id === book.id ? { ...b, status: newStatus } : b))
-    } catch {
-      console.error('Error updating book')
-    }
-  }
-
-  async function deleteBook(id: number) {
-    try {
-      await fetch(`/api/books/${id}`, { method: 'DELETE' })
-      setBooks(books.filter(b => b.id !== id))
-      setDeleteConfirm(null)
-    } catch {
-      console.error('Error deleting book')
-    }
-  }
-
   async function handleContactSubmit(e: React.FormEvent) {
     e.preventDefault()
     setFormSubmitting(true)
@@ -109,26 +96,20 @@ export default function HomePage() {
     }
   }
 
-  const getInitials = (author: string) => {
-    return author.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase()
-  }
-
-  const totalBooks = books.length
-  const pendingBooks = books.filter(b => b.status === 'Pendiente').length
-  const completedBooks = books.filter(b => b.status === 'Leído').length
-
   const navLinks = [
     { label: 'Inicio', href: '#inicio' },
-    { label: 'Mis Libros', href: '#mis-libros' },
+    { label: 'Lecturas', href: '#lecturas' },
+    { label: 'Mi Biblioteca', href: '#biblioteca' },
+    { label: 'Estadísticas', href: '#estadisticas' },
     { label: 'Contacto', href: '#contacto' },
-    { label: 'Acerca de', href: '#acerca' },
+    { label: 'Ayuda', href: '#ayuda' },
   ]
 
   return (
     <div className="min-h-screen">
       {/* Sticky Nav */}
-      <nav className="sticky top-0 z-50 bg-[#F9F7F4]/95 backdrop-blur-sm border-b border-[#e5e2de]">
-        <div className="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
+      <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-[#e5e2de]">
+        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <BookOpen className="w-6 h-6 text-[#D97757]" />
             <span className="font-semibold text-lg" style={{ fontFamily: 'Poppins, sans-serif' }}>Libros Leídos</span>
@@ -141,12 +122,19 @@ export default function HomePage() {
                 {link.label}
               </a>
             ))}
+            <Button
+              onClick={() => setShowModal(true)}
+              className="bg-[#D97757] hover:bg-[#c56646] text-white text-sm px-4 py-2 h-auto"
+            >
+              <Plus className="w-4 h-4 mr-1" />
+              Nuevo Libro
+            </Button>
           </div>
 
           {/* Mobile Menu Button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 hover:bg-white rounded-lg transition-colors"
+            className="md:hidden p-2 hover:bg-[#F9F7F4] rounded-lg transition-colors"
             aria-label="Toggle menu"
           >
             <Menu className="w-5 h-5" />
@@ -154,7 +142,7 @@ export default function HomePage() {
         </div>
 
         {/* Mobile Nav Panel */}
-        <div className={`md:hidden overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${mobileMenuOpen ? 'opacity-100 translate-y-0 pointer-events-auto max-h-64' : 'opacity-0 -translate-y-4 pointer-events-none max-h-0'}`}>
+        <div className={`md:hidden overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${mobileMenuOpen ? 'opacity-100 translate-y-0 pointer-events-auto max-h-80' : 'opacity-0 -translate-y-4 pointer-events-none max-h-0'}`}>
           <div className="px-4 pb-4 space-y-2">
             {navLinks.map((link, index) => (
               <a
@@ -167,144 +155,70 @@ export default function HomePage() {
                 {link.label}
               </a>
             ))}
+            <Button
+              onClick={() => { setShowModal(true); setMobileMenuOpen(false) }}
+              className="w-full mt-2 bg-[#D97757] hover:bg-[#c56646] text-white"
+            >
+              <Plus className="w-4 h-4 mr-1" />
+              Nuevo Libro
+            </Button>
           </div>
         </div>
       </nav>
 
-      {/* Hero Section */}
-      <section id="inicio" className="py-16 md:py-24">
-        <div className="max-w-5xl mx-auto px-4 text-center">
-          <p className="text-sm text-[#D97757] font-medium mb-4">Tu biblioteca personal</p>
-          <h1 className="text-3xl md:text-5xl font-bold text-[#2C2C2C] mb-4" style={{ fontFamily: 'Poppins, sans-serif' }}>
-            Mi Biblioteca Personal
+      {/* Hero Section with Gradient */}
+      <section id="inicio" className="py-20 md:py-28 bg-gradient-to-br from-[#D97757] via-[#E8956F] to-[#F5A962]">
+        <div className="max-w-6xl mx-auto px-4 text-center">
+          <h1 className="text-4xl md:text-6xl font-bold text-white mb-6" style={{ fontFamily: 'Poppins, sans-serif' }}>
+            Tu historia de lectura
           </h1>
-          <p className="text-[#7A756F] text-lg mb-8 max-w-xl mx-auto">
-            Organiza tus libros pendientes y completados. Lleva un registro de todo lo que lees.
+          <p className="text-white/90 text-lg md:text-xl mb-8 max-w-2xl mx-auto">
+            Registra cada libro, recuerda cada historia. Tu biblioteca personal te espera.
           </p>
           <Button
             onClick={() => setShowModal(true)}
-            className="bg-[#D97757] hover:bg-[#c56646] text-white px-6 py-3 h-auto text-base"
+            className="bg-white text-[#D97757] hover:bg-white/90 px-8 py-4 h-auto text-lg font-semibold"
           >
             <Plus className="w-5 h-5 mr-2" />
-            Agregar Libro
+            Comenzar ahora
           </Button>
         </div>
       </section>
 
-      {/* Stats Bar */}
-      <section className="py-6 border-y border-[#e5e2de] bg-white">
-        <div className="max-w-5xl mx-auto px-4">
-          <div className="flex flex-wrap justify-center gap-6 md:gap-12 text-sm">
-            <div className="flex items-center gap-2">
-              <Book className="w-4 h-4 text-[#7A756F]" />
-              <span className="text-[#7A756F]">Total de libros:</span>
-              <span className="font-semibold text-[#2C2C2C]">{totalBooks}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Clock className="w-4 h-4 text-[#F5A962]" />
-              <span className="text-[#7A756F]">Pendientes:</span>
-              <span className="font-semibold text-[#2C2C2C]">{pendingBooks}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <CheckCircle className="w-4 h-4 text-[#6BAA75]" />
-              <span className="text-[#7A756F]">Completados:</span>
-              <span className="font-semibold text-[#2C2C2C]">{completedBooks}</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Books Grid */}
-      <section id="mis-libros" className="py-16">
-        <div className="max-w-5xl mx-auto px-4">
-          <h2 className="text-2xl font-bold text-[#2C2C2C] mb-8" style={{ fontFamily: 'Poppins, sans-serif' }}>
-            Mis Libros
+      {/* Lecturas recientes - Book Grid */}
+      <section id="lecturas" className="py-16 bg-[#F9F7F4]">
+        <div className="max-w-6xl mx-auto px-4">
+          <h2 className="text-2xl md:text-3xl font-bold text-[#2C2C2C] mb-8" style={{ fontFamily: 'Poppins, sans-serif' }}>
+            Lecturas recientes
           </h2>
 
-          {loading ? (
-            <div className="text-center py-12 text-[#7A756F]">Cargando...</div>
-          ) : books.length === 0 ? (
-            <div className="text-center py-12">
-              <Book className="w-12 h-12 text-[#e5e2de] mx-auto mb-4" />
-              <p className="text-[#7A756F]">No tienes libros registrados aún.</p>
-              <Button
-                onClick={() => setShowModal(true)}
-                className="mt-4 bg-[#D97757] hover:bg-[#c56646] text-white"
-              >
-                Agregar tu primer libro
-              </Button>
-            </div>
-          ) : (
-            <div className="grid md:grid-cols-2 gap-4">
-              {books.map(book => (
-                <Card key={book.id} className="bg-white border-[#e5e2de] hover:shadow-md transition-shadow relative group">
-                  <CardContent className="p-5">
-                    <div className="flex items-start gap-4">
-                      <div className="w-12 h-12 rounded-full bg-[#F9F7F4] flex items-center justify-center text-[#D97757] font-semibold text-sm shrink-0">
-                        {getInitials(book.author)}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-start justify-between gap-2">
-                          <h3 className="font-semibold text-[#2C2C2C] truncate">{book.title}</h3>
-                          {deleteConfirm === book.id ? (
-                            <div className="flex items-center gap-1 shrink-0">
-                              <button
-                                onClick={() => deleteBook(book.id)}
-                                className="p-1 text-red-600 hover:bg-red-50 rounded transition-colors"
-                                aria-label="Confirmar eliminar"
-                              >
-                                <Check className="w-4 h-4" />
-                              </button>
-                              <button
-                                onClick={() => setDeleteConfirm(null)}
-                                className="p-1 text-[#7A756F] hover:bg-[#F9F7F4] rounded transition-colors"
-                                aria-label="Cancelar"
-                              >
-                                <X className="w-4 h-4" />
-                              </button>
-                            </div>
-                          ) : (
-                            <button
-                              onClick={() => setDeleteConfirm(book.id)}
-                              className="p-1 text-[#e5e2de] hover:text-[#7A756F] rounded transition-colors opacity-0 group-hover:opacity-100"
-                              aria-label="Eliminar libro"
-                            >
-                              <X className="w-4 h-4" />
-                            </button>
-                          )}
-                        </div>
-                        <p className="text-sm text-[#7A756F] mb-3">{book.author}</p>
-                        <div className="flex items-center justify-between">
-                          <Badge
-                            className={`${
-                              book.status === 'Leído'
-                                ? 'bg-[#6BAA75] text-white border-[#6BAA75]'
-                                : 'bg-[#F5A962] text-white border-[#F5A962]'
-                            }`}
-                          >
-                            {book.status}
-                          </Badge>
-                          <button
-                            onClick={() => toggleStatus(book)}
-                            className="text-sm text-[#D97757] hover:text-[#c56646] font-medium transition-colors flex items-center gap-1"
-                          >
-                            {book.status === 'Pendiente' ? (
-                              <>
-                                <Check className="w-4 h-4" />
-                                Marcar como Leído
-                              </>
-                            ) : (
-                              'Desmarcar'
-                            )}
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          )}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+            {recentBooks.map(book => (
+              <Card key={book.id} className="bg-white border-[#e5e2de] hover:shadow-lg transition-shadow overflow-hidden">
+                <CardContent className="p-0">
+                  {/* Book Cover */}
+                  <div
+                    className="h-40 md:h-48 flex items-center justify-center"
+                    style={{ backgroundColor: book.coverColor }}
+                  >
+                    <BookOpen className="w-12 h-12 text-white/60" />
+                  </div>
+                  {/* Book Info */}
+                  <div className="p-4">
+                    <h3 className="font-semibold text-[#2C2C2C] text-sm md:text-base line-clamp-2 mb-1">
+                      {book.title}
+                    </h3>
+                    <p className="text-xs md:text-sm text-[#7A756F] mb-2 truncate">
+                      {book.author}
+                    </p>
+                    <p className="text-xs text-[#D97757]">
+                      Completado: {book.completedDate}
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -377,81 +291,60 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* CTA Split */}
-      <section className="py-16">
-        <div className="max-w-5xl mx-auto px-4">
-          <div className="bg-[#2C2C2C] rounded-xl p-8 md:p-12 md:flex md:items-center md:justify-between">
-            <div className="mb-6 md:mb-0">
-              <h2 className="text-2xl font-bold text-white mb-2" style={{ fontFamily: 'Poppins, sans-serif' }}>
-                Empieza a organizar tu lectura
-              </h2>
-              <p className="text-gray-400">Agrega tus primeros libros y lleva un registro de todo lo que lees.</p>
+      {/* Multi-column Footer */}
+      <footer className="py-12 bg-[#2C2C2C]">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+            {/* Brand */}
+            <div className="md:col-span-1">
+              <div className="flex items-center gap-2 mb-4">
+                <BookOpen className="w-6 h-6 text-[#D97757]" />
+                <span className="font-semibold text-lg text-white" style={{ fontFamily: 'Poppins, sans-serif' }}>Libros Leídos</span>
+              </div>
+              <p className="text-gray-400 text-sm">
+                Tu biblioteca personal para registrar y organizar todas tus lecturas.
+              </p>
             </div>
-            <Button
-              onClick={() => setShowModal(true)}
-              className="bg-[#D97757] hover:bg-[#c56646] text-white px-6"
-            >
-              <Plus className="w-5 h-5 mr-2" />
-              Agregar Libro
-            </Button>
-          </div>
-        </div>
-      </section>
 
-      {/* About Section */}
-      <section id="acerca" className="py-16 bg-white border-y border-[#e5e2de]">
-        <div className="max-w-2xl mx-auto px-4 text-center">
-          <h2 className="text-2xl font-bold text-[#2C2C2C] mb-4" style={{ fontFamily: 'Poppins, sans-serif' }}>
-            Acerca de Libros Leídos
-          </h2>
-          <p className="text-[#7A756F] leading-relaxed">
-            Esta es una aplicación personal para registrar los libros que lees. Guarda el título, autor y estado de cada libro,
-            permitiéndote distinguir fácilmente entre lecturas pendientes y completadas. Una herramienta simple para lectores
-            que quieren mantener un registro organizado de su colección.
-          </p>
-        </div>
-      </section>
+            {/* Navegación */}
+            <div>
+              <h3 className="font-semibold text-white mb-4">Navegación</h3>
+              <ul className="space-y-2 text-sm">
+                <li><a href="#inicio" className="text-gray-400 hover:text-white transition-colors">Inicio</a></li>
+                <li><a href="#lecturas" className="text-gray-400 hover:text-white transition-colors">Lecturas recientes</a></li>
+                <li><a href="#biblioteca" className="text-gray-400 hover:text-white transition-colors">Mi Biblioteca</a></li>
+                <li><a href="#estadisticas" className="text-gray-400 hover:text-white transition-colors">Estadísticas</a></li>
+              </ul>
+            </div>
 
-      {/* Process Steps */}
-      <section className="py-16">
-        <div className="max-w-5xl mx-auto px-4">
-          <h2 className="text-2xl font-bold text-[#2C2C2C] mb-8 text-center" style={{ fontFamily: 'Poppins, sans-serif' }}>
-            Cómo funciona
-          </h2>
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="text-center">
-              <div className="w-12 h-12 rounded-full bg-[#D97757] text-white flex items-center justify-center mx-auto mb-4 font-bold">1</div>
-              <h3 className="font-semibold text-[#2C2C2C] mb-2">Agrega un libro</h3>
-              <p className="text-sm text-[#7A756F]">Ingresa el título y autor del libro que estás leyendo o quieres leer.</p>
+            {/* Cuenta */}
+            <div>
+              <h3 className="font-semibold text-white mb-4">Cuenta</h3>
+              <ul className="space-y-2 text-sm">
+                <li><a href="#perfil" className="text-gray-400 hover:text-white transition-colors">Mi Perfil</a></li>
+                <li><a href="#configuracion" className="text-gray-400 hover:text-white transition-colors">Configuración</a></li>
+                <li><a href="#privacidad" className="text-gray-400 hover:text-white transition-colors">Privacidad</a></li>
+                <li><a href="#ayuda" className="text-gray-400 hover:text-white transition-colors">Ayuda</a></li>
+              </ul>
             </div>
-            <div className="text-center">
-              <div className="w-12 h-12 rounded-full bg-[#D97757] text-white flex items-center justify-center mx-auto mb-4 font-bold">2</div>
-              <h3 className="font-semibold text-[#2C2C2C] mb-2">Marca tu progreso</h3>
-              <p className="text-sm text-[#7A756F]">Actualiza el estado cuando termines de leer un libro.</p>
-            </div>
-            <div className="text-center">
-              <div className="w-12 h-12 rounded-full bg-[#D97757] text-white flex items-center justify-center mx-auto mb-4 font-bold">3</div>
-              <h3 className="font-semibold text-[#2C2C2C] mb-2">Organiza tu colección</h3>
-              <p className="text-sm text-[#7A756F]">Visualiza fácilmente tus lecturas pendientes y completadas.</p>
+
+            {/* Contacto */}
+            <div>
+              <h3 className="font-semibold text-white mb-4">Contacto</h3>
+              <ul className="space-y-2 text-sm">
+                <li><a href="#contacto" className="text-gray-400 hover:text-white transition-colors">Formulario de contacto</a></li>
+                <li><span className="text-gray-400">hola@librosleidos.com</span></li>
+                <li><a href="#soporte" className="text-gray-400 hover:text-white transition-colors">Soporte técnico</a></li>
+                <li><a href="#sugerencias" className="text-gray-400 hover:text-white transition-colors">Sugerencias</a></li>
+              </ul>
             </div>
           </div>
-        </div>
-      </section>
 
-      {/* Footer */}
-      <footer className="py-8 border-t border-[#e5e2de]">
-        <div className="max-w-5xl mx-auto px-4">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-2">
-              <BookOpen className="w-5 h-5 text-[#D97757]" />
-              <span className="font-semibold" style={{ fontFamily: 'Poppins, sans-serif' }}>Libros Leídos</span>
-            </div>
-            <div className="flex gap-6 text-sm text-[#7A756F]">
-              <a href="#inicio" className="hover:text-[#2C2C2C] transition-colors">Inicio</a>
-              <a href="#mis-libros" className="hover:text-[#2C2C2C] transition-colors">Mis Libros</a>
-              <a href="#contacto" className="hover:text-[#2C2C2C] transition-colors">Contacto</a>
-            </div>
-            <p className="text-xs text-[#7A756F]">© 2026 Libros Leídos. Todos los derechos reservados.</p>
+          {/* Bottom bar */}
+          <div className="border-t border-gray-700 pt-8">
+            <p className="text-center text-gray-500 text-sm">
+              © 2026 Libros Leídos. Todos los derechos reservados.
+            </p>
           </div>
         </div>
       </footer>
