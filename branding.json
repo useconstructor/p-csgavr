@@ -1,0 +1,13 @@
+{
+  "primaryColor": "#F9F7F4",
+  "secondaryColor": "#FFFFFF",
+  "backgroundColor": "#F9F7F4",
+  "textColor": "#2C2C2C",
+  "accentColor": "#D97757",
+  "fontHeading": "Poppins",
+  "fontBody": "Inter",
+  "borderRadius": "0.25rem",
+  "logoText": "Libros Leídos",
+  "logoImageUrl": "https://vabacntbfcwhgkjqajcw.supabase.co/storage/v1/object/public/screenshots/projects/P-CSGAVR/logo.png",
+  "tone": "minimal"
+}
